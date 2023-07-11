@@ -1,0 +1,22 @@
+---
+- name: "Create account {{ account.username }}"
+  when: account.username not in synusers_list.stdout_lines
+  ansible.builtin.command: "/usr/syno/sbin/synouser --add {{ account.username | quote }} {{ account.password | quote }} '' 0 '' '' "
+
+- name: "Set groups for {{ account.username }}"
+  when: account.groups is defined
+  ansible.builtin.command: "/usr/syno/sbin/synogroup --memberadd {{ group | quote }} {{ account.username | quote }}"
+  loop: "{{ account.groups }}"
+  loop_control:
+    loop_var: group
+
+- name: "Check homedir is exisiting for {{ account.username }}"
+  when: true
+  ansible.builtin.shell: "/usr/syno/sbin/synouser --get {{ account.username }} | head -n6 | tail -n1 | awk -F'[' '{print $2}' | awk -F']' '{print $1}'"
+  ignore_errors: true
+  changed_when: false
+  register: homedir_is_existing
+
+- name: "Create account homedir {{ account.username }}"
+  when: (homedir_is_existing.stdout | length) == 0
+  ansible.builtin.command: "/usr/syno/bin/synouserhome --prepare-folder {{ account.username | quote }}"

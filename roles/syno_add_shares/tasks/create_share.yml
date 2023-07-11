@@ -1,0 +1,16 @@
+- name: RW if exists
+  ansible.builtin.set_fact:
+    share_rw: "{{ share.rights.RW is defined | ternary(share.rights.RW, '') }}"
+    share_ro: "{{ share.rights.RO is defined | ternary(share.rights.RO, '') }}"
+
+
+- name: Create Share
+  when: true
+  ansible.builtin.command: |
+    /usr/syno/sbin/synoshare --add {{ share.name | quote }} \
+    {{ share.description | quote }} {{ share.path | quote }} \
+    '' \
+    {{ share_rw | join(',') | quote }}
+    {{ share_ro | join(',') | quote }}
+    1 \
+    0

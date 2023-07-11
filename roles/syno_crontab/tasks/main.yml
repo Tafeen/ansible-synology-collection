@@ -1,0 +1,8 @@
+- name: Update crontab
+  ansible.builtin.lineinfile:
+    path: /etc/crontab
+    state: present
+    line: "{{ minute }} {{ hour }} {{ monthday }} {{ month }} {{ weekday }} {{ user }} {{ job }}"
+    insertbefore: BOF
+  register: cron
+  notify: Restart crond

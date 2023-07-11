@@ -1,0 +1,9 @@
+---
+argument_specs:
+  main:
+    short_description: The main entry point for the syno_add_accounts role.
+    options:
+      syno_accounts:
+        type: "list"
+        required: true
+        description: "List of accounts"

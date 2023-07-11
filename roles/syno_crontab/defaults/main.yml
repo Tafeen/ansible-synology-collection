@@ -1,0 +1,7 @@
+minute: "0"
+hour: "12"
+monthday: "*"
+month: "*"
+weekday: "1"
+user: "root"
+job: "{{ undef(hint='You must specify cron job') }}"

@@ -1,0 +1,7 @@
+---
+# IDEA: Change only if permissions not set
+- name: Set share right for {{ right.key }}
+  when: true
+  ansible.builtin.command: |
+    /usr/syno/sbin/synoshare --setuser {{ share.name | quote }} \
+    {{ right.key | quote }} '=' {{ right.value | join(',') | quote }}

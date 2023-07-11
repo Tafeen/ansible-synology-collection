@@ -1,0 +1,10 @@
+- name: List rights
+  when: true
+  ansible.builtin.command: "/usr/syno/sbin/synoshare --list_acl {{ share.name }}"
+  changed_when: false
+
+- name: Add right type
+  ansible.builtin.include_tasks: tasks/single_right.yml
+  loop: "{{ share.rights | dict2items }}"
+  loop_control:
+    loop_var: right

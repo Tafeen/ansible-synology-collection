@@ -1,0 +1,13 @@
+- name: Get list of accounts
+  become: true
+  ansible.builtin.command: "/usr/syno/sbin/synouser --enum all"
+  when: true
+  changed_when: false
+  register: synusers_list
+
+- name: Create accounts from provided list
+  no_log: true # Hide used passwords
+  ansible.builtin.include_tasks: tasks/add_account.yml
+  loop: "{{ syno_accounts }}"
+  loop_control:
+    loop_var: account

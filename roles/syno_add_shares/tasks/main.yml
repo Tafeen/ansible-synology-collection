@@ -1,0 +1,27 @@
+- name: Get list of Shares
+  become: true
+  ansible.builtin.command: "/usr/syno/sbin/synoshare synoshare --enum all"
+  when: true
+  changed_when: false
+  register: synoshares_list
+
+- name: Create share if not present
+  when: share.name not in synoshares_list.stdout_lines
+  ansible.builtin.include_tasks: tasks/create_share.yml
+  loop: "{{ syno_shares }}"
+  loop_control:
+    loop_var: share
+
+- name: Ensure share rights
+  ansible.builtin.include_tasks: tasks/add_rights.yml
+  loop: "{{ syno_shares }}"
+  loop_control:
+    loop_var: share
+
+- name: Set recycle bin
+  when: share.recycle is defined and share.recycle
+  ansible.builtin.command:
+    /usr/syno/bin/synorecycle --enable {{ share.name }}
+  loop: "{{ syno_shares }}"
+  loop_control:
+    loop_var: share

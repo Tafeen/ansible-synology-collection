@@ -1,0 +1,33 @@
+---
+- name: Get list of installed packages
+  when: true
+  changed_when: false
+  ansible.builtin.command: /usr/syno/bin/synopkg list --name
+  register: synopkg_list
+
+- name: Install package
+  when: package not in synopkg_list.stdout_lines
+  ansible.builtin.command: /usr/syno/bin/synopkg install_from_server {{ package }}
+  loop: "{{ syno_packages }}"
+  loop_control:
+    loop_var: package
+
+- name: Update packages
+  when: syno_upgrade_packages
+  ansible.builtin.command: /usr/syno/bin/synopkg upgradeall
+  register: synopkg_output
+  changed_when: synopkg_output.rc != 0
+
+- name: List what packages could not be updated
+  block:
+    - name: Get list of upgradeable packages
+      when: true
+      changed_when: false
+      ansible.builtin.command: /usr/syno/bin/synopkg checkupdateall
+      register: able_to_upgrade
+
+    - name: What packages could not be updated with automation # noqa: ignore-errors
+      when: (able_to_upgrade.stdout_lines | length) > 0
+      ansible.builtin.fail:
+        msg: "{{ able_to_upgrade.stdout | from_json }}"
+      ignore_errors: true

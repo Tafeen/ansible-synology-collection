@@ -1,0 +1,11 @@
+syno_shares: "{{ undef(hint='You must specify syno_shares') }}"
+syno_upgrade_packages: false
+  # - name: media
+  #   description: MEDIA Share
+  #   path: /volume2/media
+  #   rights:
+  #     RW:
+  #       - daniel
+  #     RO:
+  #       - maciek
+  #  recycle: true
